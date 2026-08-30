@@ -6,7 +6,7 @@ import { createRequire } from "node:module";
 
 const require = createRequire("/Users/mike/Desktop/zovo-ext/engine/7-live-qa/");
 const { chromium } = require("playwright");
-const dist = new URL("../dist/", import.meta.url).pathname;
+const dist = process.argv[2] || new URL("../dist/", import.meta.url).pathname;
 const profile = mkdtempSync(join(tmpdir(), "skiplist-runtime-"));
 const executablePath = chromium.executablePath();
 const context = await chromium.launchPersistentContext(profile, {
