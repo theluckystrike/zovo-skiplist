@@ -8,6 +8,7 @@ Build with Node.js 20+:
 
 ```sh
 npm install
+cp config.json.example config.json
 npm run build
 ```
 
