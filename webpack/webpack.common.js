@@ -85,9 +85,9 @@ module.exports = env => {
                         callback();
                     }
                 } else {
-                    documentScriptBuild.close(() => {
-                        documentScriptBuild.run(() => {
-                            callback();
+                    documentScriptBuild.run((runError) => {
+                        documentScriptBuild.close((closeError) => {
+                            callback(runError || closeError);
                         });
                     });
                 }
@@ -101,9 +101,6 @@ module.exports = env => {
             'skiplist-options': path.join(__dirname, srcDir + 'skiplist-ui/options.ts'),
             background: path.join(__dirname, srcDir + 'background.ts'),
             content: path.join(__dirname, srcDir + 'content.ts'),
-            options: path.join(__dirname, srcDir + 'options.ts'),
-            help: path.join(__dirname, srcDir + 'help.ts'),
-            permissions: path.join(__dirname, srcDir + 'permissions.ts'),
         },
         output: {
             path: path.join(__dirname, '../dist/js'),
@@ -146,11 +143,20 @@ module.exports = env => {
                         from: '.',
                         to: '../',
                         globOptions: {
-                            ignore: ['manifest.json', '**/.git/**', '**/crowdin.yml'],
+                            ignore: [
+                                'manifest.json',
+                                '**/.git/**',
+                                '**/crowdin.yml',
+                                '**/permissions/**',
+                                '**/options/options.css',
+                                '**/popup.css',
+                                '**/help/images/**'
+                            ],
                         },
                         context: './public',
                         filter: async (path) => {
                             if (path.match(/(\/|\\)_locales(\/|\\).+/)) {
+                                if (!path.match(/(\/|\\)_locales(\/|\\)en(\/|\\)/)) return false;
                                 if (env.browser.toLowerCase() === "edge" 
                                         && !edgeLanguages.includes(path.match(/(?<=\/_locales\/)[^/]+(?=\/[^/]+$)/)[0])) {
                                     return false;
@@ -191,6 +197,12 @@ module.exports = env => {
 
                             return content;
                         }
+                    },
+                    {
+                        from: 'LICENSE',
+                        to: '../LICENSE',
+                        context: '.',
+                        toType: 'file'
                     }
                 ]
             }),

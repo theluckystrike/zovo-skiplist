@@ -177,6 +177,11 @@ interface SBStorage {
         titlePattern: string;
     };
 
+    slp_license_status: "free" | "pro";
+    slp_license_key: string;
+    slp_license_verified_at: number;
+    slp_license_exp: number;
+
     skipRules: AdvancedSkipRule[];
 }
 
@@ -478,6 +483,18 @@ const syncDefaults = {
         name: "sponsor" as Category,
         option: CategorySkipOption.AutoSkip
     }, {
+        name: "selfpromo" as Category,
+        option: CategorySkipOption.AutoSkip
+    }, {
+        name: "interaction" as Category,
+        option: CategorySkipOption.AutoSkip
+    }, {
+        name: "intro" as Category,
+        option: CategorySkipOption.AutoSkip
+    }, {
+        name: "outro" as Category,
+        option: CategorySkipOption.AutoSkip
+    }, {
         name: "poi_highlight" as Category,
         option: CategorySkipOption.ManualSkip
     }, {
@@ -615,7 +632,11 @@ const localDefaults = {
         introSeconds: 45,
         outroSeconds: 30,
         titlePattern: "podcast|episode|interview"
-    }
+    },
+    slp_license_status: "free" as const,
+    slp_license_key: "",
+    slp_license_verified_at: 0,
+    slp_license_exp: 0
 };
 
 const Config = new ConfigClass(syncDefaults, localDefaults, migrateOldSyncFormats);

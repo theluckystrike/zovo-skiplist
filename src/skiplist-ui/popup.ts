@@ -3,6 +3,10 @@
 
 export {};
 
+import { hasValidProLicense, isProfileEntitled } from "../skiplist/license";
+
+// Storage values are intentionally heterogeneous at this browser-API boundary.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRecord = Record<string, any>;
 
 function element<T extends HTMLElement>(id: string): T {
@@ -57,6 +61,9 @@ async function refreshPopup(): Promise<void> {
         unsubmittedSegments: {},
         skipProfiles: {},
         skipProfileTemp: null,
+        slp_license_status: "free",
+        slp_license_verified_at: 0,
+        slp_license_exp: 0,
     });
 
     element("savedTime").textContent = formatMinutes(
@@ -75,13 +82,16 @@ async function refreshPopup(): Promise<void> {
 
     const select = element<HTMLSelectElement>("profileSelect");
     select.replaceChildren(new Option("Default", ""));
-    for (const [id, profile] of Object.entries(
-        local.skipProfiles as Record<string, AnyRecord>,
-    )) {
+    const profiles = local.skipProfiles as Record<string, AnyRecord>;
+    for (const [id, profile] of Object.entries(profiles)) {
+        if (!isProfileEntitled(id, profiles, local)) continue;
         select.add(new Option(profile.name || "Untitled profile", id));
     }
-    if (local.skipProfileTemp?.time > Date.now() - 60 * 60 * 1000)
+    if (local.skipProfileTemp
+        && isProfileEntitled(local.skipProfileTemp.configID, profiles, local))
         select.value = local.skipProfileTemp.configID;
+    else if (local.skipProfileTemp && !hasValidProLicense(local))
+        await storageSet(chrome.storage.local, { skipProfileTemp: null });
 
     const info = await sendToActiveTab({
         message: "isInfoFound",

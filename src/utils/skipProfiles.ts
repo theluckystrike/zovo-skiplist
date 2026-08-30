@@ -1,11 +1,12 @@
 import { getChannelIDInfo, getVideoID } from "../../maze-utils/src/video";
 import Config, { ConfigurationID, CustomConfiguration } from "../config";
 import { SponsorHideType, SponsorTime } from "../types";
+import { isProfileEntitled } from "../skiplist/license";
 
 let currentTabSkipProfile: ConfigurationID = null;
 
 export function getSkipProfileIDForTime(): ConfigurationID | null {
-    if (Config.local.skipProfileTemp !== null && Config.local.skipProfileTemp.time > Date.now() - 60 * 60 * 1000) {
+    if (Config.local.skipProfileTemp !== null) {
         return Config.local.skipProfileTemp.configID;
     } else {
         return null;
@@ -50,7 +51,11 @@ export function getSkipProfile(): CustomConfiguration | null {
     const configID = getSkipProfileID();
     
     if (configID) {
-        return Config.local.skipProfiles[configID];
+        return isProfileEntitled(
+            configID,
+            Config.local.skipProfiles,
+            Config.local,
+        ) ? Config.local.skipProfiles[configID] : null;
     }
 
     return null;

@@ -3,13 +3,22 @@
 
 export {};
 
+import { sanitizeBackup } from "../skiplist/backup";
+import {
+    classifyLicenseResponse,
+    hasValidProLicense,
+    isProLicenseResponse,
+    shouldRefreshLicense,
+} from "../skiplist/license";
+
 declare const __SUPABASE_ANON_KEY__: string;
 
+// Storage values are intentionally heterogeneous at this browser-API boundary.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRecord = Record<string, any>;
 const VERIFY_URL =
     "https://zgubxqomnbmxgbdhvwja.supabase.co/functions/v1/verify-extension-license";
 const KEY_PATTERN = /^ZOVO-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/i;
-const OFFLINE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 
 function element<T extends HTMLElement>(id: string): T {
     return document.getElementById(id) as T;
@@ -39,15 +48,16 @@ function countBookmarks(collection: Record<string, unknown[]>): number {
 async function hasPro(): Promise<boolean> {
     const local = await get(chrome.storage.local, {
         slp_license_status: "free",
+        slp_license_key: "",
         slp_license_verified_at: 0,
         slp_license_exp: 0,
     });
-    const now = Date.now();
-    return (
-        local.slp_license_status === "pro" &&
-        now - Number(local.slp_license_verified_at) <= OFFLINE_GRACE_MS &&
-        (!local.slp_license_exp || now <= Number(local.slp_license_exp))
-    );
+    if (shouldRefreshLicense(local) && local.slp_license_key) {
+        chrome.runtime.sendMessage({ message: "refreshLicense" }, () => {
+            void chrome.runtime.lastError;
+        });
+    }
+    return hasValidProLicense(local);
 }
 
 function message(text: string, good = false): void {
@@ -62,7 +72,7 @@ function profileFromForm(): AnyRecord {
         ["intro", Number(value("profileIntro"))],
         ["outro", Number(value("profileOutro"))],
         ["interaction", Number(value("profileInteraction"))],
-        ["selfpromo", -1],
+        ["selfpromo", Number(value("profileSelfpromo"))],
         ["exclusive_access", -1],
         ["poi_highlight", 1],
         ["preview", -1],
@@ -181,23 +191,38 @@ async function activateLicense(): Promise<void> {
             headers: {
                 "Content-Type": "application/json",
                 apikey: __SUPABASE_ANON_KEY__,
-                Authorization: `Bearer ${__SUPABASE_ANON_KEY__}`,
             },
             body: JSON.stringify({ license_key: key, extension: "skiplist" }),
             signal: controller.signal,
         });
-        const data = await response.json();
-        const pro = data.valid === true && data.tier !== "free";
-        await set(chrome.storage.local, {
-            slp_license_status: pro ? "pro" : "free",
-            slp_license_key: pro ? key : "",
-            slp_license_verified_at: pro ? Date.now() : 0,
-            slp_license_exp: pro && Number.isFinite(data.exp) ? data.exp : 0,
-        });
+        const data: AnyRecord = await response.json();
+        const decision = classifyLicenseResponse(response.ok, response.status, data);
+        const pro = decision === "entitle" && isProLicenseResponse(response.ok, data);
+        if (pro) {
+            await set(chrome.storage.local, {
+                slp_license_status: "pro",
+                slp_license_key: key,
+                slp_license_verified_at: Date.now(),
+                // Zero means the verifier supplied no server expiry. The
+                // seven-day offline verification window still applies.
+                slp_license_exp: Number.isFinite(data.exp) && data.exp >= 0 ? data.exp : 0,
+            });
+        } else if (decision === "deny") {
+            await set(chrome.storage.local, {
+                slp_license_status: "free",
+                slp_license_key: "",
+                slp_license_verified_at: 0,
+                slp_license_exp: 0,
+            });
+        }
         message(
             pro
                 ? "License verified. Pro controls are active."
-                : data.reason || data.error || "License not valid.",
+                : decision === "deny"
+                    ? data.reason || data.error || "License not valid."
+                    : (await hasPro())
+                        ? "Verification unavailable. Using the recent verified license."
+                        : "License verification is temporarily unavailable.",
             pro,
         );
         await renderState();
@@ -304,10 +329,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const file = (event.target as HTMLInputElement).files?.[0];
             if (!file) return;
             try {
-                const data = JSON.parse(await file.text());
-                if (data.format !== "skiplist-personal-1") throw new Error();
-                await set(chrome.storage.sync, data.sync || {});
-                await set(chrome.storage.local, data.local || {});
+                const data = sanitizeBackup(JSON.parse(await file.text()));
+                if (!data) throw new Error();
+                // Validation is complete before either storage area is
+                // touched, so malformed backups cannot partially import.
+                await set(chrome.storage.sync, data.sync);
+                await set(chrome.storage.local, data.local);
                 message("Backup imported.", true);
                 await renderState();
             } catch {
@@ -315,4 +342,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         },
     );
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && [
+        "slp_license_status",
+        "slp_license_verified_at",
+        "slp_license_exp",
+    ].some((key) => key in changes)) void renderState();
 });

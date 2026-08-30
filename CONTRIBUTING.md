@@ -5,7 +5,7 @@ https://crowdin.com/project/sponsorblock
 
 # Building
 ## Building locally
-0. You must have [Node.js 22 or later](https://nodejs.org/) and npm installed. Works best on Linux
+0. You must have [Node.js 20.19+ or 22](https://nodejs.org/) and npm installed. Works best on Linux
 1. Clone with submodules
   ```bash
   git clone --recursive https://github.com/ajayyy/SponsorBlock
@@ -28,4 +28,3 @@ Run `npm run dev` (for Chrome) or `npm run dev:firefox` (for Firefox) to run the
 Known chromium bug: Extension is not loaded properly on first start. Visit `chrome://extensions/` and reload the extension.
 
 For Firefox for Android, use `npm run dev:firefox-android -- --adb-device <ip-address of the device>`. See the [Firefox documentation](https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/#debug-your-extension) for more information. You may need to edit package.json and add the parameters directly there.
-

@@ -33,7 +33,10 @@ module.exports = async env => {
                 })],
             }
             : {
-                devtool: "source-map",
+                // Chrome Web Store upload ZIPs do not need source maps. Keeping
+                // them out avoids shipping source paths and cuts the artifact
+                // size without changing runtime code.
+                devtool: false,
             }
         ),
     });

@@ -1,7 +1,7 @@
 {
     "name": "Zovo SkipList",
     "short_name": "SkipList",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "default_locale": "en",
     "description": "Save personal video skip points, apply category profiles, and track listening time saved.",
     "homepage_url": "https://zovo.one",

@@ -1,18 +1,16 @@
 import * as React from "react";
 import * as CompileConfig from "../../config.json";
 import Config from "../config";
-import { ActionType, Category, ChannelIDStatus, ContentContainer, SponsorHideType, SponsorTime } from "../types";
+import { ActionType, Category, ContentContainer, SponsorHideType, SponsorTime } from "../types";
 import SubmissionNoticeComponent from "./SubmissionNoticeComponent";
 import { RectangleTooltip } from "../render/RectangleTooltip";
 import SelectorComponent, { SelectorOption } from "./SelectorComponent";
 import { DEFAULT_CATEGORY } from "../utils/categoryUtils";
 import { getFormattedTime, getFormattedTimeToSeconds } from "../../maze-utils/src/formating";
-import { asyncRequestToServer } from "../utils/requests";
 import { defaultPreviewTime } from "../utils/constants";
 import { getVideo, getVideoDuration } from "../../maze-utils/src/video";
 import { AnimationUtils } from "../../maze-utils/src/animationUtils";
 import { Tooltip } from "../render/Tooltip";
-import { logRequest } from "../../maze-utils/src/background-request-proxy";
 
 export interface SponsorTimeEditProps {
     index: number;
@@ -781,29 +779,8 @@ class SponsorTimeEditComponent extends React.Component<SponsorTimeEditProps, Spo
     }
 
     async fetchSuggestions(description: string): Promise<void> {
-        if (this.props.contentContainer().channelIDInfo.status !== ChannelIDStatus.Found) return;
-
-        this.fetchingSuggestions = true;
-        try {
-            const result = await asyncRequestToServer("GET", "/api/chapterNames", {
-                description,
-                channelID: this.props.contentContainer().channelIDInfo.id
-            });
-            if (result.ok) {
-                const names = JSON.parse(result.responseText) as {description: string}[];
-                this.setState({
-                    suggestedNames: names.map(n => ({
-                        label: n.description
-                    }))
-                });
-            } else if (result.status !== 404) {
-                logRequest(result, "SB", "chapter suggestion")
-            }
-        } catch (e) {
-            console.warn("[SB] Caught error while fetching chapter suggestions", e);
-        } finally {
-            this.fetchingSuggestions = false;
-        }
+        void description;
+        this.setState({ suggestedNames: [] });
     }
 
     configUpdate(): void {
