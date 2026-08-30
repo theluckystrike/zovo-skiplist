@@ -1,3 +1,24 @@
+# Zovo SkipList
+
+Zovo SkipList is a GPL-3.0-or-later personal video-skip tool for Chromium. It preserves SponsorBlock's proven playback scheduler and segment editor, but deliberately does **not** connect to SponsorBlock's community API or database. Personal skip bookmarks, category profiles, podcast intro/outro rules, and listening-time statistics remain in browser storage.
+
+This is a modified fork of [ajayyy/SponsorBlock](https://github.com/ajayyy/SponsorBlock) at upstream commit `16dd5604c989a3ee8eab86416cc5ad35ee4fd746`. SponsorBlock's API/database is separately licensed CC BY-NC-SA 4.0; that noncommercial dataset is not included or used. See [CHANGES-ZOVO.md](CHANGES-ZOVO.md), [BASELINE-REPORT.md](BASELINE-REPORT.md), and [TECHNICAL-BRIEF.md](TECHNICAL-BRIEF.md).
+
+Build with Node.js 20+:
+
+```sh
+npm install
+npm run build
+```
+
+The extension output is `dist/`. The build requires a Supabase publishable anonymous key and the checked-in build script supplies Zovo's public verifier key. No secret/service-role key belongs in the extension.
+
+The complete fork, including paid-feature UI, is licensed GPL-3.0-or-later. The Pro gate is a distribution convenience, not a technical restriction: anyone may modify and rebuild the source under the GPL.
+
+---
+
+## Upstream SponsorBlock README (preserved)
+
 <p align="center">
   <a href="https://sponsor.ajay.app"><img src="public/icons/LogoSponsorBlocker256px.png" alt="Logo"></img></a>
 

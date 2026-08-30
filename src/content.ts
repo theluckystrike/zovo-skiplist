@@ -390,6 +390,7 @@ function contentLocalConfigUpdateListener(changes: StorageChangesObject) {
             case "skipProfiles":
             case "skipProfileTemp":
             case "skipRules":
+            case "podcastRules":
                 channelIDChange();
                 break;
         }
@@ -1193,6 +1194,59 @@ function setupCategoryPill() {
     categoryPill.attachToPage(isOnMobileYouTube(), isOnInvidious(), voteAsync);
 }
 
+async function applyPodcastRules(videoID: VideoID): Promise<void> {
+    sponsorTimes = (sponsorTimes || []).filter((segment) => !segment.UUID.startsWith("slp-podcast-"));
+
+    const rules = Config.local.podcastRules;
+    if (!rules?.enabled) return;
+
+    if (!getVideo()) await waitForVideo();
+    const duration = getVideoDuration();
+    if (!Number.isFinite(duration) || duration <= 0) return;
+
+    const title = videoInfo?.videoDetails?.title || document.title || "";
+    const description = videoInfo?.videoDetails?.shortDescription || "";
+    let matchesPodcast = false;
+    try {
+        matchesPodcast = new RegExp(rules.titlePattern || "podcast|episode|interview", "i")
+            .test(`${title}\n${description}`);
+    } catch {
+        matchesPodcast = /podcast|episode|interview/i.test(`${title}\n${description}`);
+    }
+    if (!matchesPodcast) return;
+
+    const generated: SponsorTime[] = [];
+    const introEnd = Math.min(Math.max(Number(rules.introSeconds) || 0, 0), duration);
+    const outroLength = Math.min(Math.max(Number(rules.outroSeconds) || 0, 0), duration);
+    if (introEnd > 0) {
+        generated.push({
+            UUID: `slp-podcast-intro-${videoID}` as SegmentUUID,
+            segment: [0, introEnd],
+            category: "intro" as Category,
+            actionType: ActionType.Skip,
+            source: SponsorSourceType.Local,
+            description: "Personal podcast intro rule",
+        });
+    }
+    if (outroLength > 0 && duration - outroLength > introEnd) {
+        generated.push({
+            UUID: `slp-podcast-outro-${videoID}` as SegmentUUID,
+            segment: [duration - outroLength, duration],
+            category: "outro" as Category,
+            actionType: ActionType.Skip,
+            source: SponsorSourceType.Local,
+            description: "Personal podcast outro rule",
+        });
+    }
+
+    if (generated.length > 0) {
+        sponsorTimes = sponsorTimes.concat(generated).sort((a, b) => a.segment[0] - b.segment[0]);
+        sponsorDataFound = true;
+        startSkipScheduleCheckingForStartSponsors();
+        updatePreviewBar();
+    }
+}
+
 async function sponsorsLookup(keepOldSubmissions = true, ignoreCache = false) {
     const videoID = getVideoID();
     if (!videoID) {
@@ -1265,6 +1319,8 @@ async function sponsorsLookup(keepOldSubmissions = true, ignoreCache = false) {
             }
         }
     }
+
+    await applyPodcastRules(videoID);
 
     notifyPopupOfSegments();
     importExistingChapters(true);
@@ -1747,11 +1803,7 @@ function sendTelemetryAndCount(skippingSegments: SponsorTime[], secondsSkipped: 
                 counted = true;
             }
 
-            if (fullSkip) asyncRequestToServer("POST", "/api/viewedVideoSponsorTime?UUID=" + segment.UUID + "&videoID=" + getVideoID())
-                .then(r => {
-                    if (!r.ok) logRequest(r, "SB", "segment skip log");
-                })
-                .catch(e => console.warn("[SB] Caught error while attempting to log segment skip", e));
+            void fullSkip;
         }
     }
 }
@@ -2505,73 +2557,18 @@ async function sendSubmitMessage(): Promise<boolean> {
         }
     }
 
-    let response: FetchResponse;
-    try {
-        response = await asyncRequestToServer("POST", "/api/skipSegments", {
-            videoID: getVideoID(),
-            userID: Config.config.userID,
-            segments: sponsorTimesSubmitting,
-            videoDuration: getVideoDuration(),
-            userAgent: extensionUserAgent(),
-        });
-    } catch (e) {
-        console.error("[SB] Caught error while attempting to submit segments", e);
-        // Show that the upload failed
-        playerButtons.submit.button.style.animation = "unset";
-        playerButtons.submit.image.src = chrome.runtime.getURL("icons/PlayerUploadFailedIconSponsorBlocker.svg");
-        alert(formatJSErrorMessage(e));
-        return false;
-    }
-
-    if (response.status === 200) {
-        stopAnimation();
-
-        // Remove segments from storage since they've already been submitted
-        delete Config.local.unsubmittedSegments[getVideoID()];
-        Config.forceLocalUpdate("unsubmittedSegments");
-
-        const newSegments = sponsorTimesSubmitting;
-        try {
-            const receivedNewSegments = JSON.parse(response.responseText);
-            if (receivedNewSegments?.length === newSegments.length) {
-                for (let i = 0; i < receivedNewSegments.length; i++) {
-                    newSegments[i].UUID = receivedNewSegments[i].UUID;
-                    newSegments[i].source = SponsorSourceType.Server;
-                }
-            }
-        } catch(e) {} // eslint-disable-line no-empty
-
-        // Add submissions to current sponsors list
-        sponsorTimes = (sponsorTimes || []).concat(newSegments).sort((a, b) => a.segment[0] - b.segment[0]);
-
-        // Increase contribution count
-        Config.config.sponsorTimesContributed = Config.config.sponsorTimesContributed + sponsorTimesSubmitting.length;
-
-        // New count just used to see if a warning "Read The Guidelines!!" message needs to be shown
-        // One per time submitting
-        Config.config.submissionCountSinceCategories = Config.config.submissionCountSinceCategories + 1;
-
-        // Empty the submitting times
-        sponsorTimesSubmitting = [];
-
-        updatePreviewBar();
-        updateCategoryPill();
-
-        return true;
-    } else {
-        // Show that the upload failed
-        playerButtons.submit.button.style.animation = "unset";
-        playerButtons.submit.image.src = chrome.runtime.getURL("icons/PlayerUploadFailedIconSponsorBlocker.svg");
-
-        if (response.status === 403 && response.responseText.startsWith("Submission rejected due to a tip from a moderator.")) {
-            openWarningDialog(skipNoticeContentContainer);
-        } else {
-            logRequest(response, "SB", "segment submission");
-            alert(getLongErrorMessage(response.status, response.responseText));
-        }
-    }
-
-    return false;
+    // Personal bookmarks are already persisted in storage.local. The upstream
+    // editor calls this callback "submit"; this fork intentionally performs no
+    // network request and simply confirms the local save.
+    stopAnimation();
+    sponsorTimesSubmitting.forEach((segment) => {
+        segment.source = SponsorSourceType.Local;
+    });
+    Config.local.unsubmittedSegments[getVideoID()] = sponsorTimesSubmitting;
+    Config.forceLocalUpdate("unsubmittedSegments");
+    updatePreviewBar();
+    updateCategoryPill();
+    return true;
 }
 
 //get the message that visually displays the video times

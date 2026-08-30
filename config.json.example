@@ -1,7 +1,7 @@
 {
-    "serverAddress": "https://sponsor.ajay.app",
-    "testingServerAddress": "https://sponsor.ajay.app/test",
-    "serverAddressComment": "This specifies the default SponsorBlock server to connect to",
+    "serverAddress": "https://local.invalid",
+    "testingServerAddress": "https://local.invalid",
+    "serverAddressComment": "Community networking is intentionally disabled in this personal-only fork",
     "categoryList": ["sponsor", "selfpromo", "exclusive_access", "interaction", "poi_highlight", "intro", "outro", "preview", "hook", "filler", "chapter", "music_offtopic"],
     "categorySupport": {
         "sponsor": ["skip", "mute", "full"],

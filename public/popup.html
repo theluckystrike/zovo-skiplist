@@ -1,13 +1,74 @@
-<html id="sponsorBlockPopupHTML">
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" /> 
-
-        <link href="popup.css" rel="stylesheet">
-        <link href="shared.css" rel="stylesheet">
-        <script src="./js/popup.js"></script>
-    </head>
-
-    <body id="sponsorBlockPopupBody">
-
-    </body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Zovo SkipList</title>
+    <link rel="stylesheet" href="skiplist-popup.css" />
+  </head>
+  <body>
+    <main class="slp-shell">
+      <header class="slp-topbar">
+        <div class="slp-brand">
+          <img src="icons/skiplist-32.png" alt="" /><span>Zovo SkipList</span>
+        </div>
+        <label class="slp-switch"
+          ><input
+            id="masterToggle"
+            type="checkbox"
+            role="switch"
+            aria-label="Enable personal skipping" /><span></span
+        ></label>
+      </header>
+      <section class="slp-hero" role="status" aria-live="polite">
+        <p class="slp-eyebrow">LISTENING TIME SAVED</p>
+        <strong id="savedTime">0 min</strong>
+        <p id="savedDetail">0 personal skips</p>
+      </section>
+      <section class="slp-card">
+        <div class="slp-cardhead">
+          <span>PERSONAL BOOKMARK</span
+          ><span class="slp-private">ON DEVICE</span>
+        </div>
+        <p id="videoStatus" class="slp-muted">
+          Open a YouTube video to mark a section.
+        </p>
+        <label class="slp-label" for="bookmarkCategory">Category</label>
+        <select id="bookmarkCategory" class="slp-select">
+          <option value="intro">Intro</option>
+          <option value="outro">Outro</option>
+          <option value="sponsor">Sponsor</option>
+          <option value="interaction">Reminder</option>
+          <option value="selfpromo">Self-promotion</option>
+        </select>
+        <button id="bookmarkButton" class="slp-primary">Start bookmark</button>
+        <p class="slp-caption">
+          Press once at the start, then again at the end. The mark stays
+          private.
+        </p>
+        <div class="slp-profile-row">
+          <label class="slp-label" for="profileSelect">ACTIVE PROFILE</label>
+          <select id="profileSelect" class="slp-select">
+            <option value="">Default</option>
+          </select>
+        </div>
+      </section>
+      <div class="slp-actions">
+        <button id="settingsButton" class="slp-secondary">
+          Manage skip list</button
+        ><a
+          class="slp-upgrade"
+          href="https://zovo.one/pricing?utm_source=zovo-skiplist&amp;utm_medium=extension&amp;utm_campaign=upgrade&amp;utm_content=popup"
+          target="_blank"
+          rel="noreferrer"
+          >Unlock Pro</a
+        >
+      </div>
+      <footer>
+        <span id="bookmarkCount">0 saved sections</span
+        ><span>Personal-only · GPL-3.0</span>
+      </footer>
+    </main>
+    <script src="js/skiplist-popup.js"></script>
+  </body>
 </html>

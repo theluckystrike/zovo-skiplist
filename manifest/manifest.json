@@ -1,23 +1,21 @@
 {
-    "name": "__MSG_fullName__",
-    "short_name": "SponsorBlock",
-    "version": "6.1.7",
+    "name": "Zovo SkipList",
+    "short_name": "SkipList",
+    "version": "1.0.0",
     "default_locale": "en",
-    "description": "__MSG_Description__",
-    "homepage_url": "https://sponsor.ajay.app",
+    "description": "Save personal video skip points, apply category profiles, and track listening time saved.",
+    "homepage_url": "https://zovo.one",
     "icons": {
-        "16": "icons/IconSponsorBlocker16px.png",
-        "32": "icons/IconSponsorBlocker32px.png",
-        "64": "icons/IconSponsorBlocker64px.png",
-        "128": "icons/IconSponsorBlocker128px.png",
-        "256": "icons/IconSponsorBlocker256px.png",
-        "512": "icons/IconSponsorBlocker512px.png",
-        "1024": "icons/IconSponsorBlocker1024px.png"
+        "16": "icons/skiplist-16.png",
+        "32": "icons/skiplist-32.png",
+        "64": "icons/skiplist-64.png",
+        "128": "icons/skiplist-128.png",
+        "256": "icons/skiplist-256.png",
+        "512": "icons/skiplist-512.png",
+        "1024": "icons/skiplist-1024.png"
     },
     "permissions": [
-        "storage",
-        "scripting",
-        "unlimitedStorage"
+        "storage"
     ],
     "options_ui": {
         "page": "options/options.html",

@@ -1,7 +1,7 @@
 {
-  "name": "sponsorblock",
+  "name": "zovo-skiplist",
   "version": "1.0.0",
-  "description": "",
+  "description": "Personal video skip bookmarks and listening profiles",
   "main": "background.js",
   "dependencies": {
     "content-scripts-register-polyfill": "^4.0.2",
@@ -50,7 +50,7 @@
     "web-run:firefox-android": "cd dist && web-ext run -t firefox-android --firefox-apk org.mozilla.fenix",
     "web-run:chrome": "cd dist && web-ext run --start-url https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm -t chromium",
     "build": "npm run build:chrome",
-    "build:chrome": "webpack --env browser=chrome --config webpack/webpack.prod.js",
+    "build:chrome": "SUPABASE_ANON_KEY=sb_publishable_RG4IVO9Qm23_xPzdQjdFPQ_QHBwbOLv webpack --env browser=chrome --config webpack/webpack.prod.js",
     "build:firefox": "webpack --env browser=firefox --config webpack/webpack.prod.js",
     "build:safari": "webpack --env browser=safari --config webpack/webpack.prod.js",
     "build:edge": "webpack --env browser=edge --config webpack/webpack.prod.js",
@@ -93,9 +93,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ajayyy/SponsorBlock.git"
+    "url": "git+https://github.com/theluckystrike/zovo-skiplist.git"
   },
-  "author": "Ajay Ramachandran",
-  "license": "GPL-3.0",
+  "author": "Ajay Ramachandran and Zovo contributors",
+  "license": "GPL-3.0-or-later",
   "private": true
 }

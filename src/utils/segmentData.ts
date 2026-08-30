@@ -1,12 +1,6 @@
 import { DataCache } from "../../maze-utils/src/cache";
-import { getHash, HashedValue } from "../../maze-utils/src/hash";
-import Config, {  } from "../config";
-import * as CompileConfig from "../../config.json";
-import { ActionTypes, SponsorSourceType, SponsorTime, VideoID } from "../types";
-import { getHashParams } from "./pageUtils";
-import { asyncRequestToServer } from "./requests";
-import { extensionUserAgent } from "../../maze-utils/src";
-import { logRequest, serializeOrStringify } from "../../maze-utils/src/background-request-proxy";
+import { SponsorTime, VideoID } from "../types";
+import { serializeOrStringify } from "../../maze-utils/src/background-request-proxy";
 
 const segmentDataCache = new DataCache<VideoID, SegmentResponse>(() => {
     return {
@@ -55,49 +49,9 @@ export async function getSegmentsForVideo(videoID: VideoID, ignoreCache: boolean
 }
 
 async function fetchSegmentsForVideo(videoID: VideoID): Promise<SegmentResponse> {
-    const extraRequestData: Record<string, unknown> = {};
-    const hashParams = getHashParams();
-    if (hashParams.requiredSegment) extraRequestData.requiredSegment = hashParams.requiredSegment;
-
-    const hashPrefix = (await getHash(videoID, 1)).slice(0, 5) as VideoID & HashedValue;
-    const hasDownvotedSegments = !!Config.local.downvotedSegments[hashPrefix.slice(0, 4)];
-    const response = await asyncRequestToServer('GET', "/api/skipSegments/" + hashPrefix, {
-        categories: CompileConfig.categoryList,
-        actionTypes: ActionTypes,
-        trimUUIDs: hasDownvotedSegments ? null : 5,
-        ...extraRequestData
-    }, {
-        "X-CLIENT-NAME": extensionUserAgent(),
-    });
-
-    if (response.ok) {
-        const receivedSegments: SponsorTime[] = JSON.parse(response.responseText)
-                    ?.filter((video) => video.videoID === videoID)
-                    ?.map((video) => video.segments)?.[0]
-                    ?.map((segment) => ({
-                        ...segment,
-                        source: SponsorSourceType.Server
-                    }))
-                    ?.sort((a, b) => a.segment[0] - b.segment[0]);
-
-        if (receivedSegments && receivedSegments.length) {
-            const result = {
-                segments: receivedSegments,
-                status: response.status
-            };
-
-            segmentDataCache.setupCache(videoID).segments = result.segments;
-            return result;
-        } else {
-            // Setup with null data
-            segmentDataCache.setupCache(videoID);
-        }
-    } else if (response.status !== 404) {
-        logRequest(response, "SB", "skip segments");
-    }
-
+    segmentDataCache.setupCache(videoID);
     return {
         segments: null,
-        status: response.status
+        status: 200
     };
 }

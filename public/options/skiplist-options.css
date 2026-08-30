@@ -1,0 +1,350 @@
+:root {
+  color-scheme: light dark;
+  --slp-accent: #3f66d4;
+  --slp-accent-dark: #2d4da5;
+  --slp-gold: #8a5000;
+  --slp-ink: #172033;
+  --slp-muted: #5e6879;
+  --slp-bg: #f4f7fb;
+  --slp-card: #fff;
+  --slp-border: #dce3ed;
+  --slp-shadow: 0 18px 48px -34px rgba(23, 32, 51, 0.55);
+}
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
+}
+body {
+  margin: 0;
+  background: var(--slp-bg);
+  color: var(--slp-ink);
+  font:
+    14px/1.55 Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+.slp-nav {
+  height: 72px;
+  background: var(--slp-card);
+  border-bottom: 1px solid var(--slp-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(24px, calc((100vw - 912px) / 2));
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.slp-nav > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.slp-nav img {
+  width: 40px;
+  height: 40px;
+}
+.slp-nav strong,
+.slp-nav span {
+  display: block;
+}
+.slp-nav strong {
+  font-size: 17px;
+}
+.slp-nav span {
+  color: var(--slp-muted);
+  font-size: 12px;
+}
+.slp-nav a {
+  color: var(--slp-gold);
+  font-weight: 750;
+  text-decoration: none;
+}
+.slp-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 56px;
+}
+.slp-intro {
+  padding: 8px 0 24px;
+}
+.slp-intro p,
+.slp-sectionhead p {
+  margin: 0;
+  color: var(--slp-accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.slp-intro h1 {
+  font-size: 40px;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  margin: 6px 0 10px;
+}
+.slp-intro > span {
+  color: var(--slp-muted);
+  font-size: 16px;
+  display: block;
+  max-width: 68ch;
+}
+.slp-panel {
+  background: var(--slp-card);
+  border: 1px solid var(--slp-border);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 16px;
+  box-shadow: none;
+}
+.slp-panel-primary {
+  box-shadow: var(--slp-shadow);
+}
+.slp-sectionhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.slp-sectionhead h2 {
+  font-size: 20px;
+  margin: 3px 0 0;
+}
+.slp-badge {
+  border-radius: 999px;
+  background: #e7ebf1;
+  color: #546173;
+  padding: 4px 9px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.slp-pro {
+  background: #fff0cf;
+  color: #7a4700;
+}
+.slp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.slp-three {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+.slp-grid label {
+  color: var(--slp-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+input,
+select {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 6px;
+  border: 1px solid var(--slp-border);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: var(--slp-card);
+  color: var(--slp-ink);
+  font: inherit;
+}
+.slp-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.slp-check input {
+  width: 18px;
+  min-height: 18px;
+  margin: 0;
+}
+.slp-primary,
+.slp-secondary,
+.slp-file {
+  min-height: 42px;
+  border-radius: 8px;
+  padding: 0 16px;
+  font: 750 14px/1 inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.slp-local-action {
+  margin-top: 16px;
+}
+.slp-primary {
+  border: 0;
+  background: var(--slp-accent);
+  color: white;
+  margin-top: 16px;
+}
+.slp-primary:hover {
+  background: var(--slp-accent-dark);
+}
+.slp-secondary,
+.slp-file {
+  border: 1px solid var(--slp-border);
+  background: var(--slp-card);
+  color: var(--slp-ink);
+}
+.slp-file input {
+  display: none;
+}
+.slp-list {
+  margin-top: 16px;
+}
+.slp-empty-list {
+  margin: 0;
+  color: var(--slp-muted);
+  font-size: 12px;
+}
+.slp-listitem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--slp-border);
+  padding: 12px 0;
+}
+.slp-listitem button {
+  border: 0;
+  background: transparent;
+  color: #b23838;
+  cursor: pointer;
+}
+.slp-note {
+  color: var(--slp-muted);
+  font-size: 12px;
+}
+.slp-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.slp-empty {
+  background: var(--slp-bg);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  color: var(--slp-muted);
+}
+.slp-empty span,
+.slp-empty strong {
+  display: block;
+}
+.slp-empty span {
+  color: var(--slp-accent);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+.slp-empty strong {
+  color: var(--slp-ink);
+}
+.slp-empty p {
+  margin: 3px 0 0;
+  font-size: 12px;
+}
+.slp-stats div {
+  background: var(--slp-bg);
+  border-radius: 10px;
+  padding: 16px;
+}
+.slp-stats strong,
+.slp-stats span {
+  display: block;
+}
+.slp-stats strong {
+  font-size: 30px;
+  line-height: 1.1;
+}
+.slp-stats span {
+  color: var(--slp-muted);
+  font-size: 12px;
+}
+.slp-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin-top: 16px;
+}
+.slp-row input {
+  margin: 0;
+  flex: 1;
+}
+.slp-row .slp-primary {
+  margin: 0;
+}
+.slp-license {
+  border-color: #e2c078;
+}
+.slp-footer {
+  max-width: 960px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+  display: flex;
+  gap: 18px;
+  color: var(--slp-muted);
+  font-size: 12px;
+}
+.slp-footer a {
+  color: var(--slp-accent);
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--slp-accent) 35%, transparent);
+  outline-offset: 2px;
+}
+@media (max-width: 700px) {
+  .slp-grid,
+  .slp-three,
+  .slp-stats {
+    grid-template-columns: 1fr;
+  }
+  .slp-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .slp-intro h1 {
+    font-size: 32px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --slp-accent: #7da2ff;
+    --slp-accent-dark: #6388e9;
+    --slp-gold: #ffd488;
+    --slp-ink: #edf2ff;
+    --slp-muted: #aeb9cd;
+    --slp-bg: #0e1420;
+    --slp-card: #171f2d;
+    --slp-border: #2b374b;
+    --slp-shadow: 0 18px 48px -34px #000;
+  }
+  .slp-primary {
+    background: #3f66d4;
+  }
+  .slp-primary:hover {
+    background: #2d4da5;
+  }
+  .slp-badge {
+    background: #293447;
+    color: #c3ccdc;
+  }
+  .slp-pro {
+    background: #392b10;
+    color: #ffd488;
+  }
+}

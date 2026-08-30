@@ -170,6 +170,13 @@ interface SBStorage {
     skipProfileTemp: { time: number; configID: ConfigurationID } | null;
     skipProfiles: Record<ConfigurationID, CustomConfiguration>;
 
+    podcastRules: {
+        enabled: boolean;
+        introSeconds: number;
+        outroSeconds: number;
+        titlePattern: string;
+    };
+
     skipRules: AdvancedSkipRule[];
 }
 
@@ -602,7 +609,13 @@ const localDefaults = {
 
     channelSkipProfileIDs: {},
     skipProfiles: {},
-    skipProfileTemp: null
+    skipProfileTemp: null,
+    podcastRules: {
+        enabled: false,
+        introSeconds: 45,
+        outroSeconds: 30,
+        titlePattern: "podcast|episode|interview"
+    }
 };
 
 const Config = new ConfigClass(syncDefaults, localDefaults, migrateOldSyncFormats);

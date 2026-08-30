@@ -28,6 +28,10 @@ const edgeLanguages = [
 
 
 module.exports = env => {
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+    if (!supabaseAnonKey) {
+        throw new Error('SUPABASE_ANON_KEY must be set at build time');
+    }
     const documentScriptBuild = webpack({
         entry: {
             document: path.join(__dirname, srcDir + 'document.ts')
@@ -93,7 +97,8 @@ module.exports = env => {
 
     return {
         entry: {
-            popup: path.join(__dirname, srcDir + 'popup/popup.tsx'),
+            'skiplist-popup': path.join(__dirname, srcDir + 'skiplist-ui/popup.ts'),
+            'skiplist-options': path.join(__dirname, srcDir + 'skiplist-ui/options.ts'),
             background: path.join(__dirname, srcDir + 'background.ts'),
             content: path.join(__dirname, srcDir + 'content.ts'),
             options: path.join(__dirname, srcDir + 'options.ts'),
@@ -127,6 +132,9 @@ module.exports = env => {
             symlinks: false
         },
         plugins: [
+            new webpack.DefinePlugin({
+                __SUPABASE_ANON_KEY__: JSON.stringify(supabaseAnonKey),
+            }),
             // Prehook to start building document script before normal build
             new DocumentScriptCompiler(),
             // fork TS checker
