@@ -99,6 +99,9 @@ assert.match(help, /Your private video skip list is ready/);
 assert(!help.includes("sponsor.ajay.app"));
 assert(!help.includes("discord"));
 assert(!help.includes("donat"));
+assert(!help.includes("only when you press Activate"));
+assert(!help.includes("metadata may be requested"));
+assert.match(help, /periodically[\s\S]{0,80}six days/);
 
 const webpack = read("webpack/webpack.common.js");
 assert.match(webpack, /SUPABASE_ANON_KEY must be set at build time/);
