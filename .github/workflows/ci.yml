@@ -7,6 +7,10 @@ jobs:
   build:
     name: Create artifacts
     runs-on: ubuntu-latest
+    env:
+      # Public Supabase publishable key, the same one build:chrome sets in package.json.
+      # Needed so build:firefox (which does not set it) passes the webpack key guard.
+      SUPABASE_ANON_KEY: sb_publishable_RG4IVO9Qm23_xPzdQjdFPQ_QHBwbOLv
 
     steps:
       # Initialization
@@ -15,7 +19,7 @@ jobs:
           submodules: recursive
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
       - run: npm ci
       - name: Copy configuration
         run: cp config.json.example config.json
